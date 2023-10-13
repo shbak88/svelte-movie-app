@@ -1,2 +1,15 @@
+# 제품모드
 [build]
+  command = "npm run build"
   functions = "functions"
+  publish = "build"
+
+# 개발모드
+[dev]
+  framework = "#custom"
+  command = "npm run dev"
+  targetPort = 8080
+  port = 8888
+  publish = "public"
+  jwtRolePath = "app_metadata.authorization.roles"
+  autoLaunch = true

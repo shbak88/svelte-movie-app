@@ -14,8 +14,6 @@ export function initMovies() {
     loading.set(false);
 };
 
-const OMDB_API_KEY = '7035c60c';
-
 export async function searchMovies(payload) {
     if (get(loading)) {
         return;
@@ -26,9 +24,13 @@ export async function searchMovies(payload) {
     let total = 0;
 
     try {
-        const res = await _fetchMovie({
+        // const res = await _fetchMovie({
+        //     ...payload,
+        //     page: 1
+        // });
+        const res = await axios.post('/.netlify/functions/movie', {
             ...payload,
-            page: 1
+            page: 1,
         });
 
         const { Search, totalResults } = res.data;
@@ -52,9 +54,13 @@ export async function searchMovies(payload) {
             if (page > (payload.number / 10)) {
                 break;
             }
-            const res = await _fetchMovie({
+            // const res = await _fetchMovie({
+            //     ...payload,
+            //     page
+            // });
+            const res = await axios.post('/.netlify/functions/movie', {
                 ...payload,
-                page
+                page,
             });
             const { Search } = res.data;
             movies.update($movies => _unionBy($movies, Search, 'imdbID'));
@@ -70,7 +76,8 @@ export async function searchMovieWithId(id) {
     }
     loading.set(true);
     // 상세조회 처리
-    const res = await _fetchMovie({ id });
+    // const res = await _fetchMovie({ id });
+    const res = await axios.post('/.netlify/functions/movie', { id });
     console.log(res);
 
     theMovie.set(res.data);
@@ -79,22 +86,5 @@ export async function searchMovieWithId(id) {
 
 
 function _fetchMovie(payload) {
-    const { title, type, year, page, id } = payload;
-    const url = id
-        ? `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&i=${id}&plot=full`
-        : `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${title}&type=${type}&y=${year}&page=${page}`;
-
-    return new Promise(async (resolve, reject) => {
-        try {
-            const res = await axios.get(url);
-            console.log(res.data);
-            if (res.data.Error) {
-                reject(res.data.Error);
-            }
-            resolve(res);
-        } catch (e) {
-            console.log(e.response.status);
-            reject(error.message);
-        }
-    });
+    
 }
